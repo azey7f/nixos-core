@@ -74,6 +74,7 @@
                 ++ [
                   # options.az.* defs
                   ./config
+                  ./services
 
                   # misc modules
                   home-manager.nixosModules.home-manager
