@@ -2,24 +2,22 @@
   description = "core lib & config defs for azey.net systems";
 
   inputs = {
-    # always latest, should be auto-updated
+    # all of these should be auto-updated
     nixpkgs.url = "nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    home-manager-unstable.url = "github:nix-community/home-manager/master";
+    home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    nixpkgs-unstable,
-    home-manager,
-  } @ inputs: let
+  outputs = {self, ...} @ inputs: let
     inherit (self) outputs;
   in {
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.alejandra;
-    formatter.aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.alejandra;
+    formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.alejandra;
+    formatter.aarch64-linux = inputs.nixpkgs.legacyPackages.aarch64-linux.alejandra;
 
     templates.default = {
       path = ./template;
@@ -38,9 +36,9 @@
       extraArgs ? {},
       # extra stuff passed to nixosSystem's specialargs
       specialArgs ? {},
-      # attrset, can contain "nixpkgs", "unstable" and "home-manager"
+      # attrset, can contain "nixpkgs", "unstable", and/or "home-manager"
       # each attr is an attrset of:
-      #   ref: a reference to the channel input, ex. nixpkgs
+      #   ref: a reference to the channel input, ex. inputs.nixpkgs
       #   config: for "nixpkgs" and "unstable", this is passed to nixpkgs on import along with system
       # by default, this flake's inputs are used with an empty config
       channels ? {},
@@ -77,7 +75,10 @@
                   # options.az.* defs
                   ./config
 
+                  # misc modules
                   home-manager.nixosModules.home-manager
+
+                  # host
                   {_module.args = extraArgs;}
                   "${path}/${name}"
                 ];
