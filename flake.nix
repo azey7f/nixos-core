@@ -72,9 +72,14 @@
               modules =
                 modules
                 ++ [
-                  # options.az.* defs
+                  # options.az.core and options.az.svc defs
                   ./config
                   ./services
+
+                  # preset values for core options
+                  #  could've been in ./config itself, but this makes it
+                  #  easy to check what is and isn't enabled by default
+                  ./preset.nix
 
                   # misc modules
                   home-manager.nixosModules.home-manager

@@ -9,7 +9,7 @@ with lib; let
   cfg = config.az.core.net;
 in {
   options.az.core.net = with azLib.opt; {
-    enable = optBool true;
+    enable = optBool false;
     systemdDefault = optBool false;
     useIwd = optBool false;
 

@@ -9,7 +9,7 @@ with lib; let
   cfg = config.az.core.programs;
 in {
   options.az.core.programs = with azLib.opt; {
-    enable = optBool true;
+    enable = optBool false;
     excludedPackages = mkOption {
       type = with types; listOf package;
       default = [];

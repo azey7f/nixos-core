@@ -8,7 +8,7 @@ with lib; let
   cfg = config.az.core.firmware;
 in {
   options.az.core.firmware = with azLib.opt; {
-    enable = optBool true;
+    enable = optBool false;
     allowUnfree = optBool false;
     microcode = optStr "amd";
   };

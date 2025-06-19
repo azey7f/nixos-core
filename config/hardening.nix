@@ -8,7 +8,7 @@ with lib; let
   cfg = config.az.core.hardening;
 in {
   options.az.core.hardening = with azLib.opt; {
-    enable = optBool true;
+    enable = optBool false;
     allowForwarding = optBool false;
     allowPing = optBool false;
   };
