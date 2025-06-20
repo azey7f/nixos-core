@@ -24,6 +24,9 @@
       description = "azey.net system type flake template";
     };
 
+    # function for creating outputs.hydraJobs from nixosConfigurations in downstream flakes
+    mkHydraJobs = builtins.mapAttrs (name: system: system.config.system.build.toplevel);
+
     # function for creating outputs.nixosConfigurations in downstream flakes
     mkHostConfigurations = {
       # path to host configs, usually ./hosts
