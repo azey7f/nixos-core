@@ -22,6 +22,12 @@
     templates.default = {
       path = ./template;
       description = "azey.net system type flake template";
+      welcomeText = ''
+        ## to initialize the git repo & nixos-core submodule, run these commands:
+        git init -b main\
+        git submodule add -b main https://git.azey.net/azey/nixos-core core\
+	git add -A
+      '';
     };
 
     # function for creating outputs.hydraJobs from nixosConfigurations in downstream flakes
