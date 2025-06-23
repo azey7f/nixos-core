@@ -26,7 +26,7 @@
         ## to initialize the git repo & nixos-core submodule, run these commands:
         git init -b main\
         git submodule add -b main https://git.azey.net/azey/nixos-core core\
-	git add -A
+        git add -A
       '';
     };
 
@@ -79,8 +79,10 @@
                 // specialArgs;
 
               modules =
-                modules
-                ++ [
+                [
+                  # misc modules
+                  home-manager.nixosModules.home-manager
+
                   # options.az.core and options.az.svc defs
                   ./config
                   ./services
@@ -89,10 +91,9 @@
                   #  could've been in ./config itself, but this makes it
                   #  easy to check what is and isn't enabled by default
                   ./preset.nix
-
-                  # misc modules
-                  home-manager.nixosModules.home-manager
-
+                ]
+                ++ modules
+                ++ [
                   # host
                   {_module.args = extraArgs;}
                   "${path}/${name}"
