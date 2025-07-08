@@ -84,6 +84,7 @@ in {
         xz
         ripgrep
         jq
+        yq
         iperf3
         ipcalc
         tree
@@ -103,6 +104,8 @@ in {
         wireguard-tools
         gnupg
         nixpkgs-review
+        scc
+        pv
       ];
   };
 }

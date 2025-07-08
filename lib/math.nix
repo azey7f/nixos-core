@@ -18,8 +18,7 @@ with lib; rec {
   binToDec = n: binToDec' n 0 1;
 
   # Subnet math
-  ## I hate subnet masks, literally the only thing that needs this is the ip= linux kernel param
-  ## IPv4-only because who in their right mind would use subnet masks with IPv6
+  ## why. are. we. still. using. IPv4, ffs
   subnet = rec {
     lengthToBits' = i: len: current:
       if i == 8

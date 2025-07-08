@@ -20,13 +20,8 @@ with lib; rec {
     );
   scanPaths = lib.lists.concatMap (dir: map (n: "${dir}/${n}") (builtins.attrNames (builtins.readDir dir)));
 
-  # MISC
-  strings = rec {
-    zeroPad = len: n:
-      if builtins.stringLength n < len
-      then zeroPad (len - 1) "0${n}"
-      else n;
-  };
-
-  toCredential = builtins.map (secret: "${builtins.replaceStrings ["/"] ["-"] secret}:/secrets/${secret}"); # used for systemd's LoadCredential in microvms
+  reverseFQDN = fqdn:
+    lib.strings.concatStringsSep "." (
+      lib.lists.reverseList (lib.strings.splitString "." fqdn)
+    );
 }

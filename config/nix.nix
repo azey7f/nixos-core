@@ -3,17 +3,17 @@
   inputs,
   config,
   lib,
+  azLib,
   pkgs,
+  unstable,
   ...
 }:
 with lib; {
-  options.az.core.nix.enable = mkOption {
-    type = types.bool;
-    default = true;
-  };
+  options.az.core.nix.enable = azLib.opt.optBool false;
+
   config = mkIf config.az.core.nix.enable {
     nix = {
-      package = pkgs.nixVersions.latest;
+      package = unstable.nixVersions.latest;
 
       # This will add each flake input as a registry
       # To make nix3 commands consistent with your flake

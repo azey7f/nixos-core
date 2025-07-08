@@ -11,11 +11,14 @@
 
     home-manager-unstable.url = "github:nix-community/home-manager/master";
     home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
+
+    disko.url = "github:nix-community/disko/latest";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = {self, ...} @ inputs: let
     inherit (self) outputs;
-  in {
+  in rec {
     formatter.x86_64-linux = inputs.nixpkgs.legacyPackages.x86_64-linux.alejandra;
     formatter.aarch64-linux = inputs.nixpkgs.legacyPackages.aarch64-linux.alejandra;
 
@@ -30,12 +33,27 @@
       '';
     };
 
+    # CA certificates
+    certs = import ./certs inputs;
+
     # function for creating outputs.hydraJobs from nixosConfigurations in downstream flakes
     mkHydraJobs = builtins.mapAttrs (name: system: system.config.system.build.toplevel);
 
     # function for creating outputs.nixosConfigurations in downstream flakes
     mkHostConfigurations = {
       # path to host configs, usually ./hosts
+      path,
+      ...
+    } @ args:
+      builtins.listToAttrs (
+        map (name: {
+          inherit name;
+          value = mkHostConf args name;
+        }) (builtins.attrNames (builtins.readDir path))
+      );
+
+    # function for creating an outputs.nixosConfigurations entry, useful for e.g. creating multiple configs from a single dir
+    mkHostConf = {
       path,
       # nixpkgs system arg
       system ? "x86_64-linux",
@@ -45,61 +63,57 @@
       extraArgs ? {},
       # extra stuff passed to nixosSystem's specialargs
       specialArgs ? {},
-      # attrset, can contain "nixpkgs", "unstable", and/or "home-manager"
+      # attrset, can contain "nixpkgs", "unstable", "home-manager" and/or "disko"
       # each attr is an attrset of:
       #   ref: a reference to the channel input, ex. inputs.nixpkgs
       #   config: for "nixpkgs" and "unstable", this is passed to nixpkgs on import along with system
       # by default, this flake's inputs are used with an empty config
       channels ? {},
-    }:
-      builtins.listToAttrs (
-        map (name: {
-          inherit name;
-          value = let
-            nixpkgs = channels.nixpkgs or {ref = inputs.nixpkgs;};
-            unstable = channels.unstable or nixpkgs;
-            home-manager = channels.home-manager.ref or inputs.home-manager;
-          in
-            nixpkgs.ref.lib.nixosSystem {
+    }: name: let
+      nixpkgs = channels.nixpkgs or {ref = inputs.nixpkgs;};
+      unstable = channels.unstable or nixpkgs;
+      home-manager = channels.home-manager.ref or inputs.home-manager;
+      disko = channels.disko.ref or inputs.disko;
+    in
+      nixpkgs.ref.lib.nixosSystem {
+        inherit system;
+
+        pkgs = import nixpkgs.ref {
+          inherit system;
+          config = nixpkgs.config or {};
+        };
+
+        specialArgs =
+          {
+            azLib = import ./lib {inherit (nixpkgs.ref) lib;};
+            unstable = import unstable.ref {
               inherit system;
-
-              pkgs = import nixpkgs.ref {
-                inherit system;
-                config = nixpkgs.config or {};
-              };
-
-              specialArgs =
-                {
-                  azLib = import ./lib {inherit (nixpkgs.ref) lib;};
-                  unstable = import unstable.ref {
-                    inherit system;
-                    config = unstable.config or {};
-                  };
-                }
-                // specialArgs;
-
-              modules =
-                [
-                  # misc modules
-                  home-manager.nixosModules.home-manager
-
-                  # options.az.core and options.az.svc defs
-                  ./config
-                  ./services
-
-                  # preset values for core options
-                  #  could've been in ./config itself, but this makes it
-                  #  easy to check what is and isn't enabled by default
-                  ./preset.nix
-                ]
-                ++ modules
-                ++ [
-                  # host
-                  {_module.args = extraArgs;}
-                  "${path}/${name}"
-                ];
+              config = unstable.config or {};
             };
-        }) (builtins.attrNames (builtins.readDir path))
-      );
+          }
+          // specialArgs;
+
+        modules =
+          [
+            # misc modules
+            home-manager.nixosModules.home-manager
+            disko.nixosModules.disko
+
+            # options.az.core and options.az.svc defs
+            ./config
+            ./services
+
+            # preset values for core options
+            #  could've been in ./config itself, but this makes it
+            #  easy to check what is and isn't enabled by default
+            ./preset.nix
+          ]
+          ++ modules
+          ++ [
+            # host
+            {_module.args = extraArgs;}
+            "${path}/${name}"
+          ];
+      };
   };
 }

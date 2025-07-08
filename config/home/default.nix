@@ -9,10 +9,7 @@ with lib; let
 in {
   imports = azLib.scanPath ./.;
 
-  options.az.core.home.enable = mkOption {
-    type = types.bool;
-    default = true;
-  };
+  options.az.core.home.enable = azLib.opt.optBool false;
 
   config = mkIf config.az.core.home.enable {
     home-manager.users =
@@ -26,7 +23,7 @@ in {
         root.home = {
           username = "root";
           homeDirectory = mkForce "/root";
-          stateVersion = "25.05"; #config.system.stateVersion;
+          stateVersion = config.system.stateVersion;
         };
       };
   };
