@@ -1,0 +1,46 @@
+variables:
+  # doesn't seem to be any way to define this via env var
+  - &secctx-backend-options
+    kubernetes:
+      securityContext:
+        privileged: false
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile:
+          type: RuntimeDefault
+
+when:
+  - event: cron
+    cron: daily # needs to be defined in woodpecker webUI, @daily
+    branch: main
+  - event: manual
+
+clone:
+  git:
+    image: woodpeckerci/plugin-git
+    settings:
+      recursive: true
+      submodule-update-remote: true
+    backend_options: *secctx-backend-options
+
+steps:
+  - name: update flake.lock
+    image: nixos/nix
+    commands:
+      - mv .git .definitely-not-git # if in a git repo, nix doesn't care about submodule changes that aren't committed
+      - nix --extra-experimental-features nix-command --extra-experimental-features flakes flake update
+      - mv .definitely-not-git .git
+    backend_options: *secctx-backend-options
+  - name: commit & push flake update
+    image: appleboy/drone-git-push
+    settings:
+      remote:
+        from_secret: REMOTE_URL # https://woodpecker-ci:<passwd>@git.azey.net/<repo>
+      branch: main
+      local_ref: main
+      commit: true
+      commit_message: "treewide: auto-update"
+      author_name: "woodpecker-ci"
+      author_email: "woodpecker-noreply@azey.net"
+    backend_options: *secctx-backend-options
