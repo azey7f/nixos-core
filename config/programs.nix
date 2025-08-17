@@ -106,10 +106,10 @@ in {
         nixpkgs-review
         scc
         pv
-	qrencode
-	skopeo
-	alejandra
-	attic-client
+        qrencode
+        skopeo
+        alejandra
+        attic-client
       ];
   };
 }
