@@ -20,6 +20,7 @@ in {
     environment.defaultPackages = lib.mkForce [];
     #nix.settings.substitute = false; # disable binary caches
 
+    boot.kernelParams = ["random.trust_cpu=off"]; # might as well
     boot.kernel.sysctl = {
       "net.ipv4.conf.all.forwarding" = cfg.allowForwarding;
       "net.ipv6.conf.all.forwarding" = cfg.allowForwarding;
