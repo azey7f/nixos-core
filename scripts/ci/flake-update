@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+#
+# runs nix flake update
+
+u="$(dirname "$0")/utils"
+$u/cache-setup || exit
+$u/cache-continuously & sleep 5
+
+mv .git .definitely-not-git # if in a git repo, nix doesn't care about submodule changes that aren't committed
+nix --extra-experimental-features nix-command --extra-experimental-features flakes flake update || exit
+mv .definitely-not-git .git
+
+touch .no-cache # cache setup already done, don't need check-build to redo it
+$u/../check-build
+code=$?
+rm .no-cache
+
+$u/cache-all
+exit $code

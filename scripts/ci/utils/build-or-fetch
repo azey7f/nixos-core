@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# package name as arg
+#
+# builds a package or fetches it from local cache
+# if that fails, tries using cache.nixos.org
+
+nix-shell -p "$@" --run true || {
+    mv ~/.config/nix/nix.conf{,.bk};
+    nix-shell -p "$@" --run true;
+    mv ~/.config/nix/nix.conf{.bk,};
+}

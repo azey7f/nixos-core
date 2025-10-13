@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# no args
+# continuously caches all new store paths, should be run after cache-setup in the background
+if [ -f .no-cache ]; then exit 0; fi
+
+nix-shell -p attic-client --run "attic watch-store main -j 16"

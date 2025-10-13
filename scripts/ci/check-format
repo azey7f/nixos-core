@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+#
+# formats cwd using alejandra
+
+u="$(dirname "$0")/utils"
+$u/cache-setup || exit
+$u/cache-continuously & sleep 5
+
+$u/build-or-fetch alejandra || exit
+nix-shell -p alejandra --run "alejandra --check ."
+code=$?
+
+$u/cache-all
+exit $code

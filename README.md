@@ -6,6 +6,7 @@ The general structure of all flakes, including this one, is this (any non-standa
 - `preset.nix`: defines which `az.*` options are enabled by default for `hosts/` (or in this flake, by all downstreams' `hosts/`)
 - `hosts/`: defines the actual systems, should ideally contain no redundant information. Not present in this flake for obvious reasons
 - `core/`: a git submodule of this flake, imported in `flake.nix`
+- `scripts/`: may or may not be included, utils and scripts used by CI
 
 This flake also includes:
 - `lib/`: `azLib` declaration, automatically imported by `mkHostConfigurations` into `specialArgs`

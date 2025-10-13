@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+#
+# runs nix flake check --all-systems
+
+u="$(dirname "$0")/utils"
+$u/cache-setup || exit
+$u/cache-continuously & sleep 5
+
+# replace ./sops with a dummy dir if it exists, nix complains it can't access it even though it's not needed
+$u/build-or-fetch git || exit
+nix-shell -p git --run "test -d sops && git rm sops && mkdir sops && touch sops/.gitkeep && git add -A"
+
+# attempt build without using cache.nixos.org, if that fails use default substituters
+nix flake check --all-systems || {
+	mv ~/.config/nix/nix.conf{,.bk};
+	echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf;
+	nix flake check --all-systems;
+	mv ~/.config/nix/nix.conf{.bk,};
+}
+
+$u/cache-all

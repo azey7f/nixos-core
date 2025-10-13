@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# no args
+# caches entire store to attic - || because attic fails if *any* path is invalid for any reason
+if [ -f .no-cache ]; then exit 0; fi
+
+nix-shell -p attic-client --run "
+    find /nix/store -mindepth 1 -maxdepth 1 ! -name .links | attic push main --stdin --no-closure -j 16
+    || find /nix/store -mindepth 1 -maxdepth 1 ! -name .links | xargs -L 16 attic push main --no-closure"
