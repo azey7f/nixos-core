@@ -3,16 +3,16 @@
 
   inputs = {
     # all of these should be auto-updated
-    nixpkgs.url = "nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "git+https://git.azey.net/mirrors/nixpkgs?shallow=1&ref=nixos-25.05";
+    nixpkgs-unstable.url = "git+https://git.azey.net/mirrors/nixpkgs?shallow=1&ref=nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "git+https://git.azey.net/mirrors/home-manager?shallow=1&ref=release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager-unstable.url = "github:nix-community/home-manager/master";
+    home-manager-unstable.url = "git+https://git.azey.net/mirrors/home-manager?shallow=1&ref=master";
     home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    disko.url = "github:nix-community/disko/latest";
+    disko.url = "git+https://git.azey.net/mirrors/disko?shallow=1&ref=refs/tags/latest"; # https://github.com/NixOS/nix/issues/5291
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -28,7 +28,7 @@
       welcomeText = ''
         ## to initialize the git repo & nixos-core submodule, run these commands:
         git init -b main\
-        git submodule add -b main https://git.azey.net/azey/nixos-core core\
+        git submodule add -b main https://git.azey.net/infra/nixos-core core\
         git add -A
       '';
     };
