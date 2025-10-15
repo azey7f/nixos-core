@@ -1,0 +1,15 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"default:pinDigestsDisabled"
+	],
+	"packageRules": [
+		{
+			"matchManagers": ["woodpecker"],
+			"automerge": true,
+			"automergeType": "branch"
+		}
+	],
+	"minimumReleaseAge": "14 days"
+}

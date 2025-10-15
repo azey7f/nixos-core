@@ -18,7 +18,7 @@ when:
 
 clone:
   git:
-    image: woodpeckerci/plugin-git:2.7.0@sha256:1ce87890a4996596c0f6c28f69afe5e07bf106c294f49fb2cfe5971b4a04f70c
+    image: woodpeckerci/plugin-git:2.7.0
     settings:
       recursive: true
       submodule-update-remote: true
@@ -26,12 +26,12 @@ clone:
 
 steps:
   - name: update flake.lock
-    image: nixos/nix:2.32.0@sha256:a3b5d472ca187c25c87a217bc730cdf7a3df7d07ee09eb37f5bc8c874f173a52
+    image: nixos/nix:2.32.0
     commands:
       - ./scripts/ci/flake-update
     backend_options: *secctx-backend-options
   - name: commit & push flake update
-    image: appleboy/drone-git-push:1.1.1@sha256:1c998f23bbbce2ed57ca75c2cebc695eee203d2e18eacf91a5ff64068337a6d9
+    image: appleboy/drone-git-push:1.1.1
     settings:
       remote:
         from_secret: REMOTE_URL # https://woodpecker-ci:<passwd>@git.azey.net/<repo>
