@@ -33,7 +33,7 @@ in {
   config = with lib.attrsets;
     mkIf (length (mapAttrsToList (n: v: v.enable) users) > 0) {
       security.sudo.enable = lib.mkForce true;
-      security.sudo.wheelNeedsPassword = false;
+      #security.sudo.wheelNeedsPassword = false;
 
       nix.settings.allowed-users = lib.mapAttrsToList (name: _: name) users;
 

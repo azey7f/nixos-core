@@ -11,13 +11,12 @@
         "narHash": "sha256-eDoSOhxGEm2PykZFa/x9QG5eTH0MJdiJ9aR00VAofXE=",
         "ref": "refs/tags/latest",
         "rev": "ff442f5d1425feb86344c028298548024f21256d",
-        "shallow": true,
+        "revCount": 1236,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--disko"
       },
       "original": {
         "ref": "refs/tags/latest",
-        "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--disko"
       }
@@ -33,13 +32,12 @@
         "narHash": "sha256-uhzsV0Q0I9j2y/rfweWeGif5AWe0MGrgZ/3TjpDYdGA=",
         "ref": "release-25.05",
         "rev": "3b955f5f0a942f9f60cdc9cacb7844335d0f21c3",
-        "shallow": true,
+        "revCount": 4813,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
       "original": {
         "ref": "release-25.05",
-        "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       }
@@ -51,27 +49,26 @@
         ]
       },
       "locked": {
-        "lastModified": 1760641408,
-        "narHash": "sha256-Y086n2U0kN9HjOo+UScwQDS27gKMiIlT6vDehvlmdAg=",
+        "lastModified": 1760662441,
+        "narHash": "sha256-mlDqR1Ntgs9uYYEAUR1IhamKBO0lxoNS4zGLzEZaY0A=",
         "ref": "master",
-        "rev": "847669dabf374d32a072bdab3f08cae7296ac011",
-        "shallow": true,
+        "rev": "722792af097dff5790f1a66d271a47759f477755",
+        "revCount": 5607,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
       "original": {
         "ref": "master",
-        "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1760423683,
-        "narHash": "sha256-Tb+NYuJhWZieDZUxN6PgglB16yuqBYQeMJyYBGCXlt8=",
+        "lastModified": 1760580664,
+        "narHash": "sha256-/YdfibIrnqXAL8p5kqCU345mzpHoOtuVIkMiI2pF4Dc=",
         "ref": "nixos-25.05",
-        "rev": "a493e93b4a259cd9fea8073f89a7ed9b1c5a1da2",
+        "rev": "98ff3f9af2684f6136c24beef08f5e2033fc5389",
         "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/NixOS--nixpkgs"

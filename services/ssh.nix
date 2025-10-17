@@ -26,7 +26,8 @@ in {
   options.az.svc.endlessh.enable = azLib.opt.optBool false;
 
   config = {
-    # OpenSSH
+    # sshd
+    # TODO: harden properly
     services.openssh = mkIf cfg.ssh.enable {
       enable = true;
       openFirewall = cfg.ssh.openFirewall;

@@ -6,13 +6,13 @@
     nixpkgs.url = "git+https://git.azey.net/mirrors/NixOS--nixpkgs?shallow=1&ref=nixos-25.05";
     nixpkgs-unstable.url = "git+https://git.azey.net/mirrors/NixOS--nixpkgs?shallow=1&ref=nixos-unstable";
 
-    home-manager.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?shallow=1&ref=release-25.05";
+    home-manager.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?ref=release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    home-manager-unstable.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?shallow=1&ref=master";
+    home-manager-unstable.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?ref=master";
     home-manager-unstable.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    disko.url = "git+https://git.azey.net/mirrors/nix-community--disko?shallow=1&ref=refs/tags/latest"; # https://github.com/NixOS/nix/issues/5291
+    disko.url = "git+https://git.azey.net/mirrors/nix-community--disko?ref=refs/tags/latest"; # https://github.com/NixOS/nix/issues/5291
     disko.inputs.nixpkgs.follows = "nixpkgs";
   };
 

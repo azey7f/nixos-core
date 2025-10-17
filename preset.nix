@@ -11,4 +11,6 @@ with lib; {
 
     nix.enable = mkDefault true;
   };
+
+  az.svc.usbguard.enable = true;
 }
