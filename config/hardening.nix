@@ -14,6 +14,7 @@ in {
     allowForwarding = optBool false;
     allowPing = optBool false;
 
+    allowSysrq = optBool false;
     malloc = optStr "graphene-hardened-light";
     virtFlushCache = optStr "always";
   };
@@ -87,7 +88,7 @@ in {
         "net.core.bpf_jit_harden" = 2;
         "dev.tty.ldisc_autoload" = false;
         "vm.unprivileged_userfaultfd" = false;
-        "kernel.sysrq" = false;
+        "kernel.sysrq" = cfg.allowSysrq;
         "kernel.perf_event_paranoid" = 3;
 
         # https://madaidans-insecurities.github.io/guides/linux-hardening.html#sysctl-userspace
