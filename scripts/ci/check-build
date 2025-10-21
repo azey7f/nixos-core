@@ -11,11 +11,6 @@ $u/build-or-fetch git || exit
 nix-shell -p git --run "test -d sops && git rm sops && mkdir sops && touch sops/.gitkeep && git add -A"
 
 # attempt build without using cache.nixos.org, if that fails use default substituters
-nix flake check --all-systems || {
-	mv ~/.config/nix/nix.conf{,.bk};
-	echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf;
-	nix flake check --all-systems;
-	mv ~/.config/nix/nix.conf{.bk,};
-}
+$u/try-or-substitute "nix flake check --all-systems" || exit
 
 $u/cache-all

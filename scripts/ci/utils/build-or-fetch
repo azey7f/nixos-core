@@ -3,9 +3,6 @@
 #
 # builds a package or fetches it from local cache
 # if that fails, tries using cache.nixos.org
+u="$(dirname "$0")"
 
-nix-shell -p "$@" --run true || {
-    mv ~/.config/nix/nix.conf{,.bk};
-    nix-shell -p "$@" --run true;
-    mv ~/.config/nix/nix.conf{.bk,};
-}
+$u/try-or-substitute "nix-shell -p $@ --run true" || exit

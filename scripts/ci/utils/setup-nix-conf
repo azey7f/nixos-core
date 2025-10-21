@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# no args
+# sets ~/.config/nix/nix.conf
+
+mkdir -p ~/.config/nix
+echo "
+experimental-features = nix-command flakes
+keep-going = true
+always-allow-substitutes = true
+" > ~/.config/nix/nix.conf

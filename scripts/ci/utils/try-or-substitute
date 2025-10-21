@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# command to run as args
+#
+# tries to run a command with default substituters
+# if it fails, tries again using cache.nixos.org
+u="$(dirname "$0")"
+
+$@ || {
+	mv ~/.config/nix/nix.conf{,.bk};
+	$u/setup-nix-conf;
+	$@ || exit;
+	mv ~/.config/nix/nix.conf{.bk,};
+} || exit
