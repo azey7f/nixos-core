@@ -16,7 +16,7 @@ systems=$(nix eval .\#nixosConfigurations --apply builtins.attrNames 2>&1) || ex
 $u/build-or-fetch gnused || exit
 for system in $(echo $systems | nix-shell -p gnused --run "sed 's/\\[\\(.*\\)\\]/\\1/'")
 do
-	nix build .\#nixosConfigurations.$system.config.system.build.toplevel || {
+	nix build .\#nixosConfigurations.${system}-cross.config.system.build.toplevel || {
 		mv ~/.config/nix/nix.conf{,.bk};
 		echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf;
 		nix build .\#nixosConfigurations.$system.config.system.build.toplevel
