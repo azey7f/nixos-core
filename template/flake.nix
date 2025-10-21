@@ -11,8 +11,7 @@
   } @ inputs: let
     inherit (self) outputs;
   in rec {
-    formatter.x86_64-linux = core.inputs.nixpkgs.legacyPackages.x86_64-linux.alejandra;
-    formatter.aarch64-linux = core.inputs.nixpkgs.legacyPackages.aarch64-linux.alejandra;
+    inherit (core.outputs) formatter;
 
     nixosConfigurations = core.mkHostConfigurations {
       path = ./hosts;
