@@ -10,12 +10,18 @@ $u/cache-continuously & sleep 5
 $u/build-or-fetch git || exit
 nix-shell -p git --run "test -d sops && git rm sops && mkdir sops && touch sops/.gitkeep && git add -A"
 
-# attempt build without using cache.nixos.org, if that fails use default substituters
-nix flake check --all-systems || {
-	mv ~/.config/nix/nix.conf{,.bk};
-	echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf;
-	nix flake check --all-systems;
-	mv ~/.config/nix/nix.conf{.bk,};
-}
+# attempt builds without using cache.nixos.org, if that fails use default substituters
+systems=$(nix eval .\#nixosConfigurations --apply builtins.attrNames 2>&1) || exit
+
+$u/build-or-fetch gnused || exit
+for system in $(echo $systems | nix-shell -p gnused --run "sed 's/\\[\\(.*\\)\\]/\\1/'")
+do
+	nix build .\#nixosConfigurations.$system.config.system.build.toplevel || {
+		mv ~/.config/nix/nix.conf{,.bk};
+		echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf;
+		nix build .\#nixosConfigurations.$system.config.system.build.toplevel
+		mv ~/.config/nix/nix.conf{.bk,};
+	} || exit
+done
 
 $u/cache-all
