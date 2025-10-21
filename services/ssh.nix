@@ -22,6 +22,8 @@ in {
       default = [];
     };
     passwordAuth = optBool false;
+
+    usePAM = optBool false;
   };
   options.az.svc.endlessh.enable = azLib.opt.optBool false;
 
@@ -34,13 +36,15 @@ in {
       ports = cfg.ssh.ports;
       settings = {
         PasswordAuthentication = cfg.ssh.passwordAuth;
+        ChallengeResponseAuthentication = cfg.ssh.passwordAuth;
+        UsePAM = cfg.ssh.usePAM;
+        PermitEmptyPasswords = false;
         KbdInteractiveAuthentication = false;
+
+        TCPKeepAlive = true;
+        ClientAliveInterval = 60;
+        ClientAliveCountMax = 5;
       };
-      extraConfig = ''
-        TCPKeepAlive yes
-        ClientAliveInterval 60
-        ClientAliveCountMax 5
-      '';
     };
 
     users.users.root.openssh.authorizedKeys.keys = cfg.ssh.keys;

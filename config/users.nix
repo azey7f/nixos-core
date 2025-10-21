@@ -12,7 +12,9 @@ in {
     type = with types;
       attrsOf (submodule ({name, ...}: {
         options = with azLib.opt; {
-          enable = optBool false;
+          enable = optBool true;
+          wheel = optBool false;
+
           name = mkOption {
             type = with types; passwdEntry str;
             default = name;
@@ -30,10 +32,15 @@ in {
     default = {};
   };
 
-  config = with lib.attrsets;
-    mkIf (length (mapAttrsToList (n: v: v.enable) users) > 0) {
-      security.sudo.enable = lib.mkForce true;
-      #security.sudo.wheelNeedsPassword = false;
+  config = with lib.attrsets; let
+    enabled = filterAttrs (n: v: v.enable) users;
+    wheel = filterAttrs (n: v: v.wheel) enabled;
+    anyEnabled = builtins.length (builtins.attrNames enabled) > 0;
+    anyWheel = builtins.length (builtins.attrNames wheel) > 0;
+  in
+    mkIf anyEnabled {
+      security.sudo.enable = anyWheel;
+      # security.sudo.wheelNeedsPassword = false;
 
       nix.settings.allowed-users = lib.mapAttrsToList (name: _: name) users;
 

@@ -15,8 +15,28 @@ in {
     allowPing = optBool false;
 
     allowSysrq = optBool false;
+    allowKexec = optBool false;
+    forcePTI = optBool false; # +sec, -perf: https://en.wikipedia.org/wiki/Kernel_page-table_isolation#Implementation
+
     malloc = optStr "graphene-hardened-light";
     virtFlushCache = optStr "always";
+
+    kernelLockdown = optBool true;
+    lockKmodules = optBool true;
+    enabledModules = mkOption {
+      type = with types; listOf str;
+      default = [];
+    };
+
+    disableWrappers = optBool true;
+    enabledWrappers = mkOption {
+      type = with types; listOf str;
+      default = [];
+    };
+    extraDisabledWrappers = mkOption {
+      type = with types; listOf str;
+      default = [];
+    };
   };
 
   config = mkIf cfg.enable {
@@ -31,7 +51,12 @@ in {
     # misc system stuff
     environment.defaultPackages = lib.mkForce [];
     systemd.coredump.enable = false;
-    security.sudo.enable = false;
+    security.sudo = {
+      enable = lib.mkDefault false;
+      execWheelOnly = true;
+      extraConfig = "Defaults lecture=never"; # not hardening but this is a nice place for it
+    };
+    az.core.hardening.enabledWrappers = lib.optional config.security.sudo.enable "sudo";
 
     networking.firewall = {
       enable = true; # TODO: nftables by default?
@@ -40,10 +65,11 @@ in {
 
     # kernel stuff
     boot.kernelPackages = pkgs.linuxKernel.packages.linux_hardened;
-    # security.lockKernelModules = true;
-    security.protectKernelImage = true;
+
+    security.lockKernelModules = cfg.lockKmodules;
+    security.protectKernelImage = !cfg.allowKexec;
     security.virtualisation.flushL1DataCache = cfg.virtFlushCache;
-    security.forcePageTableIsolation = false; # "pti=on" - perf impact: https://en.wikipedia.org/wiki/Kernel_page-table_isolation#Implementation
+    security.forcePageTableIsolation = cfg.forcePTI;
 
     security.allowUserNamespaces = true; # necessary for nix.settings.sandbox
     security.unprivilegedUsernsClone = false;
@@ -102,8 +128,9 @@ in {
 
         # https://github.com/NixOS/nixpkgs/blob/9e19e8fbb5b180404cc2b130c51d578e3b7ef998/nixos/modules/profiles/hardened.nix#L104-L135
         "kernel.ftrace_enabled" = mkDefault false;
+
         # https://madaidans-insecurities.github.io/guides/linux-hardening.html#core-dumps
-        "kernel.core_pattern" = "|/bin/false";
+        "kernel.core_pattern" = "|${pkgs.coreutils}/bin/false";
         "fs.suid_dumpable" = false;
 
         # https://saylesss88.github.io/nix/hardening_NixOS.html#further-hardening-with-sysctl
@@ -119,39 +146,43 @@ in {
       SCUDO_OPTIONS = "zero_contents=true";
     };
 
-    boot.kernelParams = [
-      "random.trust_cpu=off" # might as well
+    boot.kernelParams =
+      [
+        "random.trust_cpu=off" # might as well
 
-      # https://tails.net/contribute/design/kernel_hardening/
-      # https://madaidans-insecurities.github.io/guides/linux-hardening.html#boot-kernel
-      "slab_nomerge"
-      "vsyscall=none"
-      "debugfs=off"
-      "page_alloc.shuffle=1"
+        # https://tails.net/contribute/design/kernel_hardening/
+        # https://madaidans-insecurities.github.io/guides/linux-hardening.html#boot-kernel
+        "slab_nomerge"
+        "vsyscall=none"
+        "debugfs=off"
+        "page_alloc.shuffle=1"
 
-      "mce=0" # even on servers, better to panic than get silent mem corruption
-      "randomize_kstack_offset=on"
-      "oops=panic" # TODO: make sure this doesn't break anything...
+        "mce=0" # even on servers, better to panic than get silent mem corruption
+        "randomize_kstack_offset=on"
+        "oops=panic" # NOTE: might break stuff, but haven't encountered any issues so far
 
-      "init_on_alloc=1"
-      "init_on_free=1"
+        "init_on_alloc=1"
+        "init_on_free=1"
 
-      # "module.sig_enforce=1"
-      # "lockdown=confidentiality"
-
-      "quiet"
-      "loglevel=0"
-    ];
+        "quiet"
+        "loglevel=0"
+      ]
+      ++ lib.optionals cfg.kernelLockdown [
+        # NOTE: breaks some modules, maybe?
+        # so far everything works fine though
+        "module.sig_enforce=1"
+        "lockdown=confidentiality"
+      ];
 
     # blacklisted modules
     # https://github.com/NixOS/nixpkgs/blob/9e19e8fbb5b180404cc2b130c51d578e3b7ef998/nixos/modules/profiles/hardened.nix#L74-L102
-    boot.blacklistedKernelModules = [
-      # Obscure network protocols
+    boot.blacklistedKernelModules = lib.lists.subtractLists cfg.enabledModules [
+      # obscure network protocols
       "ax25"
       "netrom"
       "rose"
 
-      # Old or rare or insufficiently audited filesystems
+      # old, rare or insufficiently audited filesystems
       "adfs"
       "affs"
       "bfs"
@@ -167,12 +198,65 @@ in {
       "jfs"
       "minix"
       "nilfs2"
-      #"ntfs"
+      "ntfs"
       "omfs"
       "qnx4"
       "qnx6"
       "sysv"
       "ufs"
     ];
+
+    # disable as many setuid wrappers as possible
+    security.wrappers = lib.mkIf cfg.disableWrappers (
+      builtins.listToAttrs (builtins.map (name: {
+          inherit name;
+          value.enable = lib.mkForce false;
+        }) (lib.lists.subtractLists cfg.enabledWrappers ([
+            # would've mapped config.security.wrappers directly, but that causes inf recursion :<
+            # but hey, at least this way everything is commented
+
+            # seems to be pretty important, but so far everything's working fine, so...
+            # TODO: test w/ KDE on desktops
+            "dbus-daemon-launch-helper"
+
+            # FUSE, breakage can maybe(?) be circumvented by running stuff like sshfs as root
+            # TODO: verify not having suid on fusermount{,3} is actually fine
+            "fusermount"
+            "fusermount3"
+
+            # seems to just be a more fine-grained sudo alternative, shouldn't cause breakage
+            "pkexec"
+
+            # see https://github.com/polkit-org/polkit/pull/501, suid isn't necessary
+            # TODO: notify nixpkgs
+            "polkit-agent-helper-1"
+
+            # mostly unused, but NOTE: newgidmap/newuidmap is necessary for running containers
+            "sg"
+            "newgrp"
+            "newgidmap"
+            "newuidmap"
+
+            # can be replaced with sudo -i if actually needed
+            "su"
+            # sudoedit isn't really necessary for systems with a single physical user (me!)
+            "sudoedit"
+
+            # afaict only the `users` fstab mount option uses suid, not needed
+            "umount"
+            "mount"
+
+            # sshd works without this provided UsePAM = no & /etc/shadow passwd is set to *
+            # disabling it also makes any passwd-based login impossible system-wide
+            "unix_chkpwd"
+          ]
+          ++ cfg.extraDisabledWrappers)))
+    );
+    security.enableWrappers = !(cfg.disableWrappers && 0 == (builtins.length cfg.enabledWrappers));
+
+    az.svc.ssh = lib.mkIf (!(builtins.elem "unix_chkpwd" cfg.enabledWrappers)) {
+      # SSH needs unix_chpwd for PAM
+      usePAM = false;
+    };
   };
 }
