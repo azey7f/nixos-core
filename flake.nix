@@ -40,25 +40,20 @@
     mkHostConfigurations = {
       # path to host configs, usually ./hosts
       path,
-      # see mkHostConf
-      channels ? {},
       ...
     } @ args:
       builtins.listToAttrs (
-        (channels.nixpkgs or {ref = inputs.nixpkgs;}).ref.lib.lists.concatMap
-        (mkHostConf args) (builtins.attrNames (builtins.readDir path))
+        map (name: {
+          inherit name;
+          value = mkHostConf args name;
+        }) (builtins.attrNames (builtins.readDir path))
       );
 
-    # function for creating outputs.nixosConfigurations entries tied to a host
-    # useful downstream for e.g. creating multiple configs from a single dir
-    # returns a listOf attrs with 2 elements - ${name} and ${name}-cross,
-    # the second of which is built in CI
+    # function for creating an outputs.nixosConfigurations entry, useful for e.g. creating multiple configs from a single dir
     mkHostConf = {
       path,
       # nixpkgs system arg
       system ? "x86_64-linux",
-      # buildPlatform for the -cross config
-      buildSystem ? "x86_64-linux",
       # extra modules added to all systems
       modules ? [],
       # extra stuff passed to each module using _module.args
@@ -69,72 +64,31 @@
       # each attr is an attrset of:
       #   ref: a reference to the channel input, ex. inputs.nixpkgs
       #   config: for "nixpkgs" and "unstable", this is passed to nixpkgs on import along with system
-      #   extraArgs: for "nixpkgs and "unstable", these are passed to the import next to system and config
       # by default, this flake's inputs are used with an empty config
       channels ? {},
     }: name: let
-      processedChannels = rec {
-        nixpkgs = channels.nixpkgs or {ref = inputs.nixpkgs;};
-        unstable = channels.unstable or nixpkgs;
-        home-manager = channels.home-manager.ref or inputs.home-manager;
-        disko = channels.disko.ref or inputs.disko;
-      };
-      args = {
-        # explicitly re-defined so the default values propagate
-        inherit path system modules extraArgs specialArgs;
-      };
-
-      lib = processedChannels.nixpkgs.ref.lib;
-    in [
-      {
-        inherit name;
-        value = mkNixosSystem processedChannels args name;
-      }
-      {
-        name = "${name}-cross";
-        value = let
-          crossChannels =
-            if (system == buildSystem)
-            then processedChannels
-            else
-              builtins.mapAttrs (n: v:
-                v
-                // {
-                  extraArgs.buildPlatform = buildSystem;
-                  extraArgs.hostPlatform = system;
-                })
-              processedChannels;
-        in
-          mkNixosSystem crossChannels args name;
-      }
-    ];
-
-    # internal function, creates the individual nixosConfigurations
-    mkNixosSystem = {
-      nixpkgs,
-      unstable,
-      home-manager,
-      disko,
-    }: args: name:
+      nixpkgs = channels.nixpkgs or {ref = inputs.nixpkgs;};
+      unstable = channels.unstable or nixpkgs;
+      home-manager = channels.home-manager.ref or inputs.home-manager;
+      disko = channels.disko.ref or inputs.disko;
+    in
       nixpkgs.ref.lib.nixosSystem {
-        inherit (args) system;
+        inherit system;
 
-        pkgs = import nixpkgs.ref ({
-            inherit (args) system;
-            config = nixpkgs.config or {};
-          }
-          // (nixpkgs.extraArgs or {}));
+        pkgs = import nixpkgs.ref {
+          inherit system;
+          config = nixpkgs.config or {};
+        };
 
         specialArgs =
           {
             azLib = import ./lib {inherit (nixpkgs.ref) lib;};
-            unstable = import unstable.ref ({
-                inherit (args) system;
-                config = unstable.config or {};
-              }
-              // (unstable.extraArgs or {}));
+            unstable = import unstable.ref {
+              inherit system;
+              config = unstable.config or {};
+            };
           }
-          // args.specialArgs;
+          // specialArgs;
 
         modules =
           [
@@ -151,11 +105,11 @@
             #  easy to check what is and isn't enabled by default
             ./preset.nix
           ]
-          ++ args.modules
+          ++ modules
           ++ [
             # host
-            {_module.args = args.extraArgs;}
-            "${args.path}/${name}"
+            {_module.args = extraArgs;}
+            "${path}/${name}"
           ];
       };
   };
