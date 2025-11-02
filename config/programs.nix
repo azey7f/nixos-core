@@ -110,6 +110,7 @@ in {
         skopeo
         alejandra
         attic-client
+        whois
       ];
   };
 }
