@@ -6,9 +6,9 @@
 	],
 	"packageRules": [
 		{
+			"matchUpdateTypes": ["patch", "digest"],
 			"matchManagers": ["woodpecker"],
-			"automerge": true,
-			"automergeType": "branch"
+			"enabled": false
 		}
 	],
 	"minimumReleaseAge": "14 days"

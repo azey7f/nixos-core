@@ -227,8 +227,9 @@ in {
             # seems to just be a more fine-grained sudo alternative, shouldn't cause breakage
             "pkexec"
 
-            # see https://github.com/polkit-org/polkit/pull/501, suid isn't necessary
-            # TODO: notify nixpkgs
+            # so far seems to be working fine?
+            # TODO: suid shouldn't be necessary at all in next polkit release, notify nixpkgs
+            # see https://github.com/polkit-org/polkit/pull/501
             "polkit-agent-helper-1"
 
             # mostly unused, but NOTE: newgidmap/newuidmap is necessary for running containers
