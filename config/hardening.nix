@@ -73,6 +73,7 @@ in {
 
     security.allowUserNamespaces = true; # necessary for nix.settings.sandbox
     security.unprivilegedUsernsClone = false;
+    services.logrotate.checkConfig = false; # FIXME: https://github.com/NixOS/nixpkgs/issues/287194
 
     boot.kernel.sysctl =
       (
