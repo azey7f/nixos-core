@@ -66,7 +66,7 @@ in {
         # misc tools
         iptables
         age
-        du-dust
+        dust
         nmap
         ldns
         sysstat
