@@ -61,29 +61,28 @@
       # extra stuff passed to nixosSystem's specialargs
       specialArgs ? {},
       # attrset, can contain "nixpkgs", "unstable", "home-manager" and/or "disko"
-      # each attr is an attrset of:
+      # each attr is an attrset or a lambda that returns an attrset of:
       #   ref: a reference to the channel input, ex. inputs.nixpkgs
       #   config: for "nixpkgs" and "unstable", this is passed to nixpkgs on import along with system
-      #           can be an attrset or lambda called with a name argument
       # by default, this flake's inputs are used with an empty config
       channels ? {},
     }: name: let
-      nixpkgs = channels.nixpkgs or {ref = inputs.nixpkgs;};
-      unstable = channels.unstable or nixpkgs;
-      home-manager = channels.home-manager.ref or inputs.home-manager;
-      disko = channels.disko.ref or inputs.disko;
+      mkChannel = channel:
+        if builtins.typeOf channel == "lambda"
+        then channel name
+        else channel;
 
-      mkConfig = config:
-        if builtins.typeOf config == "lambda"
-        then config name
-        else config;
+      nixpkgs = mkChannel channels.nixpkgs or {ref = inputs.nixpkgs;};
+      unstable = mkChannel channels.unstable or nixpkgs;
+      home-manager = mkChannel channels.home-manager.ref or inputs.home-manager;
+      disko = mkChannel channels.disko.ref or inputs.disko;
     in
       nixpkgs.ref.lib.nixosSystem {
         inherit system;
 
         pkgs = import nixpkgs.ref {
           inherit system;
-          config = mkConfig (nixpkgs.config or {});
+          config = nixpkgs.config or {};
         };
 
         specialArgs =
@@ -91,7 +90,7 @@
             azLib = import ./lib {inherit (nixpkgs.ref) lib;};
             unstable = import unstable.ref {
               inherit system;
-              config = mkConfig (unstable.config or {});
+              config = unstable.config or {};
             };
           }
           // specialArgs;
