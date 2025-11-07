@@ -8,9 +8,10 @@
 with lib; let
   cfg = config.az.core.net;
 in {
+  imports = azLib.scanPath ./.;
+
   options.az.core.net = with azLib.opt; {
     enable = optBool false;
-    systemdDefault = optBool false;
     useIwd = optBool false;
 
     dns = {
@@ -29,7 +30,11 @@ in {
   };
 
   config = mkIf cfg.enable {
-    services.resolved.enable = !cfg.dns.enable;
+    services.resolved = {
+      enable = !cfg.dns.enable;
+      llmnr = "false";
+      fallbackDns = cfg.dns.nameservers;
+    };
     environment.etc."resolv.conf".text = mkIf cfg.dns.enable (
       (strings.concatStrings (map (ns: "nameserver ${ns}\n") cfg.dns.nameservers))
       + "options edns0 trust-ad\n"
@@ -39,19 +44,6 @@ in {
       "127.0.0.2" = lib.mkForce [];
       "127.0.0.1" = lib.mkForce ["localhost"];
       "::1" = lib.mkForce ["localhost"];
-    };
-
-    networking.useDHCP = mkDefault (!cfg.systemdDefault);
-    systemd.network = mkIf cfg.systemdDefault {
-      enable = true;
-      networks."10-wan" = {
-        matchConfig.Name = ["enp*" "eno*" "eth*"];
-        networkConfig = {
-          DHCP = "yes";
-          IPv6AcceptRA = true;
-        };
-        linkConfig.RequiredForOnline = "routable";
-      };
     };
 
     networking.wireless.iwd = mkIf cfg.useIwd {
