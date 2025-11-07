@@ -4,7 +4,7 @@ with lib; {
     firmware.enable = mkDefault true;
     hardening.enable = mkDefault true;
     net.enable = mkDefault true;
-    net.firewall."46" = {
+    net.firewall.all.filter = {
       OUTPUT.default = "ACCEPT";
       INPUT.default = "DROP";
       FORWARD.default = "DROP";

@@ -12,23 +12,32 @@ in {
         {name, ...}: let
           ipVersion = name;
         in {
-          freeformType = attrsOf (submodule ({name, ...}: {
-            options = with azLib.opt; {
-              ipVersion = lib.mkOption {
-                type = enum ["6" "4" "46"]; # https://github.com/NixOS/nixpkgs/blob/4278b522634f050f5229edade93230b73da28fc3/nixos/modules/services/networking/helpers.nix
-                default = ipVersion;
-              };
-              name = optStr name;
+          freeformType = attrsOf (submodule ({name, ...}: let
+            table = name;
+          in {
+            freeformType = attrsOf (submodule ({name, ...}: {
+              options = with azLib.opt; {
+                ipVersion = lib.mkOption {
+                  type = enum ["v6" "v4" "all"];
+                  default = ipVersion;
+                };
+                table = optStr table;
+                name = optStr name;
 
-              # whether to create/delete the chain
-              managed = optBool false;
+                # whether to create/delete the chain
+                managed = optBool false;
 
-              default = optStr "DROP";
-              rules = lib.mkOption {
-                type = listOf str;
-                default = [];
+                default = optStr (
+                  if table == "filter"
+                  then "DROP"
+                  else "ACCEPT"
+                );
+                rules = lib.mkOption {
+                  type = listOf str;
+                  default = [];
+                };
               };
-            };
+            }));
           }));
         }
       ));
@@ -42,19 +51,28 @@ in {
   config = lib.mkIf cfg.enable {
     networking.firewall = let
       createCommands = chainOp: ruleOp:
-        lib.concatMapStringsSep "\n" (chains: (
-          lib.concatMapStringsSep "\n" (chain: let
-            ipt = "ip${chain.ipVersion}tables";
-          in (
-            "${ipt} -P ${chain.name} ${
-              if chainOp == "-N"
-              then chain.default
-              else "ACCEPT"
-            }\n"
-            + lib.optionalString chain.managed "${ipt} ${chainOp} ${chain.name}\n"
-            + lib.concatMapStringsSep "\n" (rule: "${ipt} ${ruleOp} ${chain.name} ${rule}") (lib.reverseList chain.rules)
+        lib.concatMapStringsSep "\n" (tables: (
+          lib.concatMapStringsSep "\n" (chains: (
+            lib.concatMapStringsSep "\n" (chain: let
+              ipt = "ip${{
+                  v4 = "";
+                  v6 = "6";
+                  all = "46"; # https://github.com/NixOS/nixpkgs/blob/4278b522634f050f5229edade93230b73da28fc3/nixos/modules/services/networking/helpers.nix
+                }.${
+                  chain.ipVersion
+                }}tables";
+            in (
+              "${ipt} -t ${chain.table} -P ${chain.name} ${
+                if chainOp == "-N"
+                then chain.default
+                else "ACCEPT"
+              }\n"
+              + lib.optionalString chain.managed "${ipt} -t ${chain.table} ${chainOp} ${chain.name}\n"
+              + lib.concatMapStringsSep "\n" (rule: "${ipt} -t ${chain.table} ${ruleOp} ${chain.name} ${rule}") (lib.reverseList chain.rules)
+            ))
+            (builtins.attrValues chains)
           ))
-          (builtins.attrValues chains)
+          (builtins.attrValues tables)
         ))
         (builtins.attrValues cfg.firewall);
     in {
