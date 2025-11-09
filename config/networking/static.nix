@@ -75,6 +75,7 @@ in {
 
               sendRA = optBool false;
               acceptRA = optBool false;
+              privacyExt = optBool false;
             };
 
             onlineWhen = optStr "routable";
@@ -200,6 +201,10 @@ in {
                 else "no";
               IPv6SendRA =
                 if iface.ipv6.sendRA
+                then "yes"
+                else "no";
+              IPv6PrivacyExtensions =
+                if iface.ipv6.privacyExt
                 then "yes"
                 else "no";
             };
