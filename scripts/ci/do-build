@@ -11,10 +11,10 @@ $u/build-or-fetch git || exit
 nix-shell -p git --run "test -d sops && git rm sops && mkdir sops && touch sops/.gitkeep && git add -A"
 
 # attempt builds without using cache.nixos.org, if that fails use default substituters
-systems=$(nix eval ".#nixosConfigurations" --apply builtins.attrNames 2>&1) || exit
+systems=$(nix eval .\#nixosConfigurations --apply 'v: builtins.toJSON (builtins.attrNames v)') || exit
 
-$u/build-or-fetch gnused || exit
-for system in $(echo $systems | nix-shell -p gnused --run "sed 's/\\[\\(.*\\)\\]/\\1/'")
+$u/build-or-fetch jq || exit
+for system in $(echo $systems | nix-shell -p jq --run "jq -r 'fromjson | .[]'")
 do
 	$u/try-or-substitute "nix build --no-link .#nixosConfigurations.$system.config.system.build.toplevel" || exit
 done
