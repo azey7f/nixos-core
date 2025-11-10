@@ -78,7 +78,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    boot.kernel.sysctl."net.ipv6.fib_multipath_hash_policy" = true; # load-balance between servers
+    boot.kernel.sysctl."net.ipv4.fib_multipath_hash_policy" = 1;
+    boot.kernel.sysctl."net.ipv6.fib_multipath_hash_policy" = 1;
 
     az.core.net.interfaces = let
       MultiPathRoute = builtins.map (server: "fe80::@wg-${builtins.replaceStrings ["-wg-"] ["-"] server}") cfg.servers;
