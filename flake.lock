@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1758463745,
-        "narHash": "sha256-uhzsV0Q0I9j2y/rfweWeGif5AWe0MGrgZ/3TjpDYdGA=",
+        "lastModified": 1763992789,
+        "narHash": "sha256-WHkdBlw6oyxXIra/vQPYLtqY+3G8dUVZM8bEXk0t8x4=",
         "ref": "release-25.05",
-        "rev": "3b955f5f0a942f9f60cdc9cacb7844335d0f21c3",
-        "revCount": 4813,
+        "rev": "44831a7eaba4360fb81f2acc5ea6de5fde90aaa3",
+        "revCount": 4814,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1763906693,
-        "narHash": "sha256-inm7paa3myo8gE4TzjM8OPvsEg8xocWreIZBgBPEKgo=",
+        "lastModified": 1764007004,
+        "narHash": "sha256-OnonWWGrUGPc3y1TES/RVCe4Gd75YgdU8aIp07Au4lc=",
         "ref": "master",
-        "rev": "3d6c1c8fa0bea3a1a7ba23d6fa5993116766073b",
-        "revCount": 5803,
+        "rev": "125e40fa68b340aee9d474a46b540907e2537b5c",
+        "revCount": 5808,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
