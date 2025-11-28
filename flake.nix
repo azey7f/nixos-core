@@ -3,10 +3,10 @@
 
   inputs = {
     # all of these should be auto-updated
-    nixpkgs.url = "git+https://git.azey.net/mirrors/NixOS--nixpkgs?shallow=1&ref=nixos-25.05";
+    nixpkgs.url = "git+https://git.azey.net/mirrors/NixOS--nixpkgs?shallow=1&ref=nixos-25.11";
     nixpkgs-unstable.url = "git+https://git.azey.net/mirrors/NixOS--nixpkgs?shallow=1&ref=nixos-unstable";
 
-    home-manager.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?ref=release-25.05";
+    home-manager.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?ref=release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager-unstable.url = "git+https://git.azey.net/mirrors/nix-community--home-manager?ref=master";

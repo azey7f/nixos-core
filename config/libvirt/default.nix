@@ -40,13 +40,17 @@ in {
     # custom UEFI boot logo
     nixpkgs.overlays = lists.optionals cfg.customLogo [
       (final: prev: {
-        OVMF = prev.OVMF.overrideAttrs (old: {
-          postPatch =
-            (old.postPatch or "")
-            + ''
-              cp ${./arasaka.bmp} ./MdeModulePkg/Logo/Logo.bmp
-            '';
-        });
+        OVMF =
+          (prev.OVMF.overrideAttrs (old: {
+            postPatch =
+              (old.postPatch or "")
+              + ''
+                cp ${./arasaka.bmp} ./MdeModulePkg/Logo/Logo.bmp
+              '';
+          })).override {
+            secureBoot = true;
+            tpmSupport = true;
+          };
       })
     ];
 
@@ -56,16 +60,6 @@ in {
         package = pkgs.qemu_kvm;
         runAsRoot = true;
         swtpm.enable = true;
-        ovmf = {
-          enable = true;
-          packages = [
-            (pkgs.OVMF.override {
-              secureBoot = true;
-              tpmSupport = true;
-            })
-            .fd
-          ];
-        };
       };
     };
   };
