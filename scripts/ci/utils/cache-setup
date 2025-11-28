@@ -12,8 +12,6 @@ substituters = http://attic.azey.net/main
 trusted-public-keys = main:1jU1/ydAUG+eKm24k9MMGP13Bv+MmgxPyf169DNHZRM=
 " >> ~/.config/nix/nix.conf
 
-$u/setup-nix-conf
-
 # login to cache
 $u/build-or-fetch attic-client || exit
 nix-shell -p attic-client --run "attic login az http://attic.azey.net $ATTIC_TOKEN" || exit
