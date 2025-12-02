@@ -28,11 +28,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764536451,
-        "narHash": "sha256-BgtcUkBfItu9/yU14IgUaj4rYOanTOUZjUfBP20/ZB4=",
+        "lastModified": 1764613336,
+        "narHash": "sha256-L979az28t/+SXvYw9qhOno5HLlDwkZOpz6LzCLnjmRM=",
         "ref": "release-25.11",
-        "rev": "3fdd076e08049a9c7a83149b270440d9787d2df5",
-        "revCount": 5823,
+        "rev": "f3902b5d8767985680875ad86d028371100faeb3",
+        "revCount": 5827,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764534535,
-        "narHash": "sha256-TkAB7JTfQXq8wpBcCZ8cH/Dlkd/96J0VjFKqwhKl7kI=",
+        "lastModified": 1764603455,
+        "narHash": "sha256-Q70rxlbrxPcTtqWIb9+71rkJESxIOou5isZBvyOieXw=",
         "ref": "master",
-        "rev": "784a83782ce00985bee65c588d4c315ec0b5a172",
-        "revCount": 5849,
+        "rev": "effe4c007d6243d9e69ce2242d76a2471c1b8d5c",
+        "revCount": 5853,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
@@ -65,10 +65,10 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1764406085,
-        "narHash": "sha256-CYbMp8hwuOf4umokSNp+t1s4Hjd4vxXq4S5CD+xvgNs=",
+        "lastModified": 1764522689,
+        "narHash": "sha256-SqUuBFjhl/kpDiVaKLQBoD8TLD+/cTUzzgVFoaHrkqY=",
         "ref": "nixos-25.11",
-        "rev": "9561691c9f450fad7c3526916e1c4f44be0d1192",
+        "rev": "8bb5646e0bed5dbd3ab08c7a7cc15b75ab4e1d0f",
         "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/NixOS--nixpkgs"
@@ -82,10 +82,10 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1764242076,
-        "narHash": "sha256-sKoIWfnijJ0+9e4wRvIgm/HgE27bzwQxcEmo2J/gNpI=",
+        "lastModified": 1764517877,
+        "narHash": "sha256-pp3uT4hHijIC8JUK5MEqeAWmParJrgBVzHLNfJDZxg4=",
         "ref": "nixos-unstable",
-        "rev": "2fad6eac6077f03fe109c4d4eb171cf96791faa4",
+        "rev": "2d293cbfa5a793b4c50d17c05ef9e385b90edf6c",
         "shallow": true,
         "type": "git",
         "url": "https://git.azey.net/mirrors/NixOS--nixpkgs"
