@@ -38,6 +38,7 @@ in {
       );
 
     # custom UEFI boot logo
+    /*
     nixpkgs.overlays = lists.optionals cfg.customLogo [
       (final: prev: {
         OVMF =
@@ -53,6 +54,7 @@ in {
           };
       })
     ];
+    */
 
     virtualisation.libvirtd = {
       enable = true;
