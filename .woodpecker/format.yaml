@@ -24,7 +24,7 @@ clone:
 
 steps:
   - name: format & cache
-    image: nixos/nix:2.32.0
+    image: nixos/nix:2.33.0
     environment:
       ATTIC_TOKEN:
         from_secret: ATTIC_TOKEN

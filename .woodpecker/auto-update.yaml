@@ -26,7 +26,7 @@ clone:
 
 steps:
   - name: update flake.lock
-    image: nixos/nix:2.32.0
+    image: nixos/nix:2.33.0
     commands:
       - ./scripts/ci/flake-update
     backend_options: *secctx-backend-options
