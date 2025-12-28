@@ -49,11 +49,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1766682973,
-        "narHash": "sha256-GKO35onS711ThCxwWcfuvbIBKXwriahGqs+WZuJ3v9E=",
+        "lastModified": 1766869925,
+        "narHash": "sha256-JfPKJ3cb25uAfMfkIOKEzoIygraOMSEuKtIX1UFzVLI=",
         "ref": "master",
-        "rev": "91cdb0e2d574c64fae80d221f4bf09d5592e9ec2",
-        "revCount": 5935,
+        "rev": "bec08ef6e3b9d92f391a2940f6dbeffa50b17fa8",
+        "revCount": 5938,
         "type": "git",
         "url": "https://git.azey.net/mirrors/nix-community--home-manager"
       },
