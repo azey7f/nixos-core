@@ -31,7 +31,7 @@ steps:
       - ./scripts/ci/flake-update
     backend_options: *secctx-backend-options
   - name: commit & push flake update
-    image: appleboy/drone-git-push:1.1.1
+    image: appleboy/drone-git-push:1.2.0
     settings:
       remote:
         from_secret: REMOTE_URL # https://woodpecker-ci:<passwd>@git.azey.net/<repo>
